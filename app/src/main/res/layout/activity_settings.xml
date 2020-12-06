@@ -18,5 +18,34 @@
             android:layout_height="512dp" app:srcCompat="@drawable/background" android:id="@+id/imageView2"
             app:layout_constraintTop_toBottomOf="@+id/imageView" app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY" app:layout_constraintHorizontal_bias="0.0"/>
+    <Button
+            android:text="Setup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/setup_b"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="44dp"
+            app:layout_constraintHorizontal_bias="0.498"/>
+    <Button
+            android:text="Templates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/templates_b"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/setup_b"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="44dp"/>
+    <Button
+            android:text="Keywords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/keywords_b"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView2" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/templates_b"
+            app:layout_constraintVertical_bias="0.154" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"/>
+    <Button
+            android:text="Endlines"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/endline_b"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/keywords_b"
+            app:layout_constraintVertical_bias="0.304" app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

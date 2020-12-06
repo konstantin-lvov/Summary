@@ -8,8 +8,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import okhttp3.*;
 import org.json.JSONObject;
+import ru.kl.summary.services.GetHandler;
 
 import java.io.*;
 import java.util.Scanner;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private final String ASSETS_PROPERTIES_FILE_NAME = "app.properties";
     private final String INTERNAL_DIR_PROPERTIES_FILE_NAME = "runtime.properties";
     private final String BACKEND_SITE_PROPERTIES_NAME = "backend.site";
-    private String TOKEN_PROPERTIES_NAME = "auth.token";
+    private final String TOKEN_PROPERTIES_NAME = "auth.token";
     private final String URL_LOGIN_ENDPOINT = "/mobileLogin";
     private final String URL_TOKEN_LOGIN_ENDPOINT = "/mobileTokenLogin";
     private final String URL_PARAMS_TOKEN = "token=";
@@ -37,17 +37,18 @@ public class MainActivity extends AppCompatActivity {
     private String BACKEND_SITE;
     private String TOKEN;
 
-    String responseFromServer;
     private String tmpNextLIne;
 
     boolean tokenExist = false;
     boolean addressOfSiteExist = false;
-    boolean gotResponse = false;
     String assetsPropFileContext;
     String internalDirPropFileContext;
 
+    GetHandler getHandler = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
 
         /*
         1. Читаем из проп файла из внутр каталога, если нет то из ассет каталога
@@ -139,13 +140,14 @@ public class MainActivity extends AppCompatActivity {
                 CountDownLatch countDownLatch = new CountDownLatch(1);
                 String url = BACKEND_SITE + URL_TOKEN_LOGIN_ENDPOINT
                         + "?" + URL_PARAMS_TOKEN + TOKEN;
-                makeRequest(url, countDownLatch);
+                getHandler = new GetHandler(url, countDownLatch);
+                getHandler.makeRequest();
                 if(!countDownLatch.await(5, TimeUnit.SECONDS)){
                     throw new TimeoutException();
                 }
-                if (gotResponse) {
+                if (getHandler.isGotResponse()) {
                     try {
-                        if (responseFromServer.equals("OK")) {
+                        if (getHandler.getResponseFromServer().equals("OK")) {
                             logIn(new View(this.getBaseContext()));
                         }
                     } catch (Exception e) {
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView topLabel = findViewById(R.id.topLabel);
         ImageView background = findViewById(R.id.background);
         organizationName = findViewById(R.id.organizationName);
-        password = findViewById(R.id.password);
+        password = findViewById(R.id.password_logo);
         login = findViewById(R.id.login);
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -182,13 +184,14 @@ public class MainActivity extends AppCompatActivity {
                             + "&" + URL_PARAMS_PAS + password.getText().toString();
                     try {
                         CountDownLatch countDownLatch = new CountDownLatch(1);
-                        makeRequest(url, countDownLatch);
+                        getHandler = new GetHandler(url, countDownLatch);
+                        getHandler.makeRequest();
                         if(!countDownLatch.await(5, TimeUnit.SECONDS)){
                             throw new TimeoutException();
                         }
-                        if (gotResponse) {
+                        if (getHandler.isGotResponse()) {
                             try {
-                                JSONObject jsonObject = new JSONObject(responseFromServer);
+                                JSONObject jsonObject = new JSONObject(getHandler.getResponseFromServer());
                                 TOKEN = jsonObject.getString("token");
                                 FileWriter writer = new FileWriter(propertiesFile);
                                 writer.write(TOKEN_PROPERTIES_NAME + "=" + TOKEN + "\n");
@@ -209,33 +212,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    void makeRequest(String url, final CountDownLatch countDownLatch) throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                call.cancel();
-                countDownLatch.countDown();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                responseFromServer = response.body().string();
-                gotResponse = true;
-                countDownLatch.countDown();
-            }
-        });
-    }
 
     public void logIn(View view) {
         Intent intent = new Intent(this, MenuActivity.class);
         startActivity(intent);
     }
+
+//    public void makeMultipleRequest(){
+//
+//        String [] endpoints = {
+//                "/mobileCallsInfo",
+//                "/mobileContacts",
+//                "/mobileEndlineTemplates",
+//                "/mobileKeywords",
+//                "/mobileSettings",
+//                "/mobileSmsTemplates"
+//        };
+//
+//        for (int i = 0; i < endpoints.length; i++){
+//            try {
+//                String url = BACKEND_SITE + endpoints[i]
+//                        + "?" + URL_PARAMS_TOKEN + TOKEN;
+//                CountDownLatch countDownLatch = new CountDownLatch(1);
+//                makeRequest(url, countDownLatch);
+//                if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
+//                    throw new TimeoutException();
+//                }
+//                if (gotResponse) {
+//                    try {
+//                        System.out.println(responseFromServer);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            } catch (Exception e){
+//                e.printStackTrace();
+//            }
+//        }
+//
+//    }
 }
