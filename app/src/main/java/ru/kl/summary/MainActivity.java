@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONObject;
 import ru.kl.summary.services.GetHandler;
+import ru.kl.summary.services.TokenHandler;
 
 import java.io.*;
 import java.util.Scanner;
@@ -76,22 +77,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (propertiesFile.exists()) {
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(propertiesFile));
-                StringBuilder text = new StringBuilder();
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null) {
-                    text.append(line);
-                    text.append('\n');
-                }
-                bufferedReader.close();
-                internalDirPropFileContext = text.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         /*
         БЛОК КОДА
@@ -110,17 +95,15 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e){
             e.printStackTrace();
         }
-        try{
-            Scanner scanner = new Scanner(internalDirPropFileContext);
-            while (scanner.hasNextLine()) {
-                tmpNextLIne = scanner.nextLine();
-                if (tmpNextLIne.contains(TOKEN_PROPERTIES_NAME)) {
-                    TOKEN = tmpNextLIne.split("=")[1];
-                    tokenExist = true;
-                }
 
-            }
-        } catch (Exception e){
+        /*
+        Пытаемся прочитать токен и если есть то выставляем флаг и идем дальше
+         */
+        TokenHandler tokenHandler = new TokenHandler();
+        try {
+            TOKEN = tokenHandler.getToken();
+            tokenExist = true;
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
