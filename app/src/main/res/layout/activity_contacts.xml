@@ -18,5 +18,19 @@
             app:layout_constraintTop_toBottomOf="@+id/imageView" app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:scaleType="fitXY" app:layout_constraintHorizontal_bias="0.0"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="335dp"
+            android:layout_height="297dp" android:id="@+id/ContactsTextView"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="28dp"
+            app:layout_constraintHorizontal_bias="0.487" android:background="#FFFFFF"/>
+    <Button
+            android:text="Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/ContactsBackButton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ContactsTextView" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.498"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,33 +20,38 @@
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
             tools:ignore="MissingConstraints"
             app:layout_constraintTop_toBottomOf="@+id/topLabel" app:layout_constraintBottom_toBottomOf="parent"
-            android:scaleType="fitXY"/>
-    <Button
-            android:text="on\off"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/onOff"
-            app:layout_constraintBottom_toTopOf="@+id/background" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginRight="16dp" android:layout_marginEnd="16dp"/>
-    <Button
-            android:text="Settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/settings"
-            app:layout_constraintTop_toBottomOf="@+id/topLabel"
-            android:layout_marginTop="32dp" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" android:onClick="goToSettings"/>
+            android:scaleType="fitXY" app:layout_constraintVertical_bias="0.0"/>
     <Button
             android:text="Contacts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:id="@+id/contacts"
-            app:layout_constraintTop_toBottomOf="@+id/settings"
-            android:layout_marginTop="32dp" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="@+id/background"
+            app:layout_constraintEnd_toEndOf="@+id/background" app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintBottom_toBottomOf="@+id/background"
+            app:layout_constraintTop_toBottomOf="@+id/topLabel" app:layout_constraintVertical_bias="0.387"/>
     <Button
             android:text="Calls Info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/callsInfo"
-            app:layout_constraintTop_toBottomOf="@+id/contacts" android:layout_marginTop="32dp"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contacts" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintVertical_bias="0.314"/>
+    <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/OnOfSwitch"
+            android:background="@android:drawable/button_onoff_indicator_off"
+            app:layout_constraintStart_toEndOf="@+id/switchTextView" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/switchTextView"
+            app:layout_constraintTop_toTopOf="@+id/switchTextView"/>
+    <TextView
+            android:text="OFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/switchTextView"
+            app:layout_constraintTop_toBottomOf="@+id/topLabel"
+            app:layout_constraintBottom_toTopOf="@+id/contacts" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.488"
+            app:layout_constraintVertical_bias="0.581"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
