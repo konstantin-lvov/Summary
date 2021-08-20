@@ -11,6 +11,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import ru.kl.summary.services.AudioRecordHandler;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -21,10 +22,15 @@ public class MenuActivity extends AppCompatActivity {
     Button contacts;
     Button callsInfo;
 
+    AudioRecordHandler audioRecordHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
+        audioRecordHandler = new AudioRecordHandler();
+        audioRecordHandler.setSpeakerOn();
 
         ImageView topLabel = findViewById(R.id.topLabel);
         ImageView background = findViewById(R.id.background);
@@ -63,10 +69,14 @@ public class MenuActivity extends AppCompatActivity {
             System.out.println(this.onOfSwitch.isActivated());
             this.switchTextView.setTextColor(Color.GREEN);
             this.switchTextView.setText("ON");
+
+            audioRecordHandler.startRecording();
         } else {
             System.out.println(this.onOfSwitch.isActivated());
             this.switchTextView.setTextColor(Color.RED);
             this.switchTextView.setText("OFF");
+
+            audioRecordHandler.stopRecording();
         }
 //        Intent intent = new Intent(this, SettingsActivity.class);
 //        startActivity(intent);
