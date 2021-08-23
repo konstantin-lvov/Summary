@@ -9,7 +9,12 @@ import android.widget.Toast;
 import ru.kl.summary.MyApp;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AudioRecordHandler {
 
@@ -24,6 +29,19 @@ public class AudioRecordHandler {
             MediaRecorder.OutputFormat.THREE_GPP };
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4,
             AUDIO_RECORDER_FILE_EXT_3GP };
+
+    public String getCurrentAudioFileName() {
+        String [] splittedPath = CurrentAudioFilePath.split("/");
+        CurrentAudioFileName = splittedPath[splittedPath.length - 1];
+        return CurrentAudioFileName;
+    }
+
+    public String getCurrentAudioFilePath() {
+        return CurrentAudioFilePath;
+    }
+
+    private String CurrentAudioFileName = "";
+    private String CurrentAudioFilePath = "";
 
     AudioManager audioManager;
 
@@ -44,15 +62,34 @@ public class AudioRecordHandler {
         }
     };
 
-    private String getFilename() {
-        String filepath = Environment.getExternalStorageDirectory().getPath();
-        File file = new File(filepath, AUDIO_RECORDER_FOLDER);
+    public Set<String> listFilesUsingJavaIO(String dir) {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+    }
 
-        if (!file.exists()) {
-            file.mkdirs();
+    public String getFilename() {
+        System.out.println("LIST OF FILES: ");
+
+        File directory = new File(MyApp.getContext().getFilesDir().toString());
+        String[] directories = directory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        System.out.println(Arrays.toString(directories));
+
+        //String filepath = Environment.getExternalStorageDirectory().getPath();
+        String filepath = MyApp.getContext().getFilesDir().getPath();
+        File dir = new File(filepath, AUDIO_RECORDER_FOLDER);
+
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
 
-        return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
+        return (dir.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
     }
 
     public void  setSpeakerOn(){
@@ -62,12 +99,14 @@ public class AudioRecordHandler {
     }
 
     public void startRecording(){
+        CurrentAudioFilePath = getFilename();
+
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(output_formats[currentFormat]);
         //recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        recorder.setOutputFile(getFilename());
+        recorder.setOutputFile(CurrentAudioFilePath);
         recorder.setOnErrorListener(errorListener);
         recorder.setOnInfoListener(infoListener);
 

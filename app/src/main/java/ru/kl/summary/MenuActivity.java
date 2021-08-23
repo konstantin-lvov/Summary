@@ -12,6 +12,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import ru.kl.summary.services.AudioRecordHandler;
+import ru.kl.summary.services.UploadObject;
+
+import java.io.IOException;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -21,6 +24,7 @@ public class MenuActivity extends AppCompatActivity {
     Switch onOfSwitch;
     Button contacts;
     Button callsInfo;
+    TextView infoTextView;
 
     AudioRecordHandler audioRecordHandler;
 
@@ -35,6 +39,8 @@ public class MenuActivity extends AppCompatActivity {
         ImageView topLabel = findViewById(R.id.topLabel);
         ImageView background = findViewById(R.id.background);
 
+        infoTextView = findViewById(R.id.infoTextView);
+
         switchTextView = findViewById(R.id.switchTextView);
         switchTextView.setGravity(Gravity.CENTER);
         switchTextView.setTextColor(Color.RED);
@@ -43,7 +49,11 @@ public class MenuActivity extends AppCompatActivity {
         onOfSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onOffRecording(view);
+                try {
+                    onOffRecording(view);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -64,7 +74,7 @@ public class MenuActivity extends AppCompatActivity {
         });
     }
 
-    public void onOffRecording(View view){
+    public void onOffRecording(View view) throws IOException {
         if(this.onOfSwitch.isChecked()){
             System.out.println(this.onOfSwitch.isActivated());
             this.switchTextView.setTextColor(Color.GREEN);
@@ -77,6 +87,13 @@ public class MenuActivity extends AppCompatActivity {
             this.switchTextView.setText("OFF");
 
             audioRecordHandler.stopRecording();
+            infoTextView.setText(audioRecordHandler.getFilename());
+
+            String nameOfUploadedObject = "record-" + audioRecordHandler.getCurrentAudioFileName();
+            UploadObject uploadObject = new UploadObject();
+            uploadObject.uploadObject("silver-aurora-294418", "summary-storage",
+                    nameOfUploadedObject, audioRecordHandler.getCurrentAudioFilePath());
+            uploadObject.stopThread();
         }
 //        Intent intent = new Intent(this, SettingsActivity.class);
 //        startActivity(intent);

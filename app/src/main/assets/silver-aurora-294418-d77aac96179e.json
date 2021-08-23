@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "silver-aurora-294418",
+  "private_key_id": "d77aac96179e88798fc0d5de5ffc25debca14bad",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDXkVtEmGJKtHEI\nH4axEFIrM6L3TVIdTYR8NQf29THXYSpDJTCG5uMIHY2j56zTH6f1toIVzuD/uVZf\nucGgvuYEFNEA5RKMFre0RDJ07qFx13TskU5IxyYE8akRNvIEHJpgWsgdu91qCi5Y\npNsM9khW9sv0fHflWeI1uqxNUEury8YBAdQFkiAxWmvSJdQ7065q5crSSIA7II2v\nM+aGt5aHLt4FdEMvVb+7s234/s8xYcagITpkfyA0htWILZA9zXLwcBfozE7UP4eQ\nH8FAQEwRHG6F+E4yv7EHl0v/3gwGTKg3N6uqFg2ESrvGse9okadlfPyamt/m+SFu\nDMrfYDzPAgMBAAECggEAEi/UGeebVKnVkXW2HjvTcDalN0/BhPG0eEAxzFQ9IL/f\nWhaJ+g+tCX2+JJ0YAnXnbJO5yjo6gbNdcKpnhiF6SXoyH0Je/A0HRwEBRXFD6Kq2\nACbK39lWwVBcJF9/hU5JI1D1ajYehOLtVxLi3OdDDNHkkjDAHXb7CUUXDVd1aD3G\nFRUWKWeTputx6b4HJgHp0OM8nC+lE+ELjs1M5OuPeA45wSi40LgI2CgFpCIkfve2\n3KnLwp52pd2Mm96P6jTof1FCTz5tx1dDP/Q30kLBqOnpprf3SG3Y1xyz3ACQ7CI2\ntx8XAxRbv2y7fLhm2qoQtVYXyqz0MkrzQIT3Yz/eaQKBgQD0nHPaVm/WfB/RT0UM\n6qg3cXEEulTbQNxYpWVhwsf4WXRcc4U1LjF8e29wPAYHnkfxeecOZCnRp/GK44eo\n//6r8APQ09DuZ9dkDVT3v2yEQKVLIL1PYQsXM8Gy626kPMg6wsD7qViTG6LZ1X9U\nNXWw/5Rw3QyboCP5pjjQhnGIWQKBgQDhmrutb68tDGZDsLHN/YavC46WC6evVwfF\n9NjdgxpPwbGv5AhKEtnBZtrkWdSdBRbco+C/QxxKoxNn8nJ5W/j8WBpn4qSUJLeX\nyHuUDwS5JRFCjpIjtaozqS60GBS1FVexgg3P318iduTZJbrm7YYwKWtEjLKsDeRy\nnjud7DlJZwKBgEX3woO/mbnmQ0uhuwSY0okZX9SUX9VfVifdF4TBLGXzYH9ZY870\naZ9Lx3J5GNhxA+8kiVzqdbPMsCCkOJe0seoIe27uR6MJ/OhXj+hVzvp9a0p0EPJ1\ntbBrU4qUIU/FOxjjwEO8CuP5UbmxgfxaVlHMqW8nK4YQZnnwe+vZqPvxAoGAcSwZ\n8csQ6VxLALHmwBrqMW1uvb5jBAZ4k8lb8OMPk+rqo/2UWvRR4D8kl2Co04v2CAD9\ngXS9AIQF/CMXYeHNaWkY9fwv61Dv+GhN9dwC1o3NtsGmddtv4jKAhz99Q8nND/LZ\n0umO488YxgWzWJzWr9pXQTADgWQGsajG51XU9wkCgYA7fqhRKcRBfv1uRyxikwAd\nt4eVYqcIRyC+zCduGIAwlXXCLrrBguMeqn4TDfdGWbIkZyyHeoS0dkGLvdC/x69z\nRhim5CcTFU7bYQfHXTyBz6Ttv5WZWeL1AVXyX8APKigkO98BVb3dbrqt01GvLETH\n5lMd7fwGmZnAA7NaT+Fy/g==\n-----END PRIVATE KEY-----\n",
+  "client_email": "konstantin-lvov@silver-aurora-294418.iam.gserviceaccount.com",
+  "client_id": "108263065307015721872",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/konstantin-lvov%40silver-aurora-294418.iam.gserviceaccount.com"
+}
