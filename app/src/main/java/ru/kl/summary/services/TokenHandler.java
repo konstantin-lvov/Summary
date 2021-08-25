@@ -43,6 +43,8 @@ public class TokenHandler extends AppCompatActivity{
         }
 
         try{
+            File file = new File(internalDirPropFileContext);
+            System.out.println("TOKENHANDLER INTERNAL DIR FILE EXIST - " + file.exists());
             Scanner scanner = new Scanner(internalDirPropFileContext);
             while (scanner.hasNextLine()) {
                 tmpNextLIne = scanner.nextLine();

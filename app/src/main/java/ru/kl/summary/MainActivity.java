@@ -49,23 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-        /*
-        1. Читаем из проп файла из внутр каталога, если нет то из ассет каталога
-        2. Если в нем есть адрес сайта то все хорошо идем дальше
-        3. Если в нем есть токен то выставляем переменные (стр и бул)
-            3.1 Пытаемся сделать запрос с текущим токеном
-        4. Если токена нет, то забираем у пользователя логин и пароль и идем на сайт с ними
-            4.1 Если запрос удачен получаем токен и записываем его во внутреннее хранилище телефона
-         */
-        /*
-        БЛОК КОДА
-        Читаем из проп файла из ассет каталога
-         */
         final File propertiesFile = new File(getBaseContext().getFilesDir(), INTERNAL_DIR_PROPERTIES_FILE_NAME);
         Context context = getApplicationContext();
-        //
         try {
             InputStream is = context.getAssets().open(ASSETS_PROPERTIES_FILE_NAME);
             int size = is.available();
@@ -77,13 +62,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*
-        БЛОК КОДА
-        Если в проп файле есть адрес сайта то все хорошо идем дальше
-        Если в нем есть токен то выставляем переменные (стр и бул)
-         */
-        try{
+        try {
             Scanner scanner = new Scanner(assetsPropFileContext);
             while (scanner.hasNextLine()) {
                 tmpNextLIne = scanner.nextLine();
@@ -92,13 +71,9 @@ public class MainActivity extends AppCompatActivity {
                     addressOfSiteExist = true;
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        /*
-        Пытаемся прочитать токен и если есть то выставляем флаг и идем дальше
-         */
         TokenHandler tokenHandler = new TokenHandler();
         try {
             TOKEN = tokenHandler.getToken();
@@ -107,25 +82,19 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
         if (!addressOfSiteExist) {
             //надо сделать страницу с вводом желаемого сервера
             System.out.println("Address of site does not exist. Please enter address.");
         }
-
-        /*
-        БЛОК КОДА
-        Пытаемся сделать запрос с текущим токеном
-         */
         if (tokenExist) {
-            System.out.println("token exist, making test request");
+            System.out.println("token exist, making test request" + TOKEN);
             try {
                 CountDownLatch countDownLatch = new CountDownLatch(1);
                 String url = BACKEND_SITE + URL_TOKEN_LOGIN_ENDPOINT
                         + "?" + URL_PARAMS_TOKEN + TOKEN;
                 getHandler = new GetHandler(url, countDownLatch);
                 getHandler.makeRequest();
-                if(!countDownLatch.await(5, TimeUnit.SECONDS)){
+                if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
                     throw new TimeoutException();
                 }
                 if (getHandler.isGotResponse()) {
@@ -142,24 +111,16 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ImageView topLabel = findViewById(R.id.topLabel);
         ImageView background = findViewById(R.id.background);
         organizationName = findViewById(R.id.organizationName);
         password = findViewById(R.id.password_logo);
         login = findViewById(R.id.login);
-
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                БЛОК КОДА
-                забираем у пользователя логин и пароль и идем на сайт с ними
-                Если запрос удачен получаем токен и записываем его во внутреннее хранилище телефона
-                */
                 if (organizationName.getText().toString().toCharArray().length > 1
                         && password.getText().toString().toCharArray().length > 1) {
                     String url = BACKEND_SITE + URL_LOGIN_ENDPOINT
@@ -169,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                         CountDownLatch countDownLatch = new CountDownLatch(1);
                         getHandler = new GetHandler(url, countDownLatch);
                         getHandler.makeRequest();
-                        if(!countDownLatch.await(5, TimeUnit.SECONDS)){
+                        if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
                             throw new TimeoutException();
                         }
                         if (getHandler.isGotResponse()) {
@@ -189,50 +150,13 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
-                    // тут будет отображение сообщения пользователю
                 }
             }
         });
     }
 
-
-
     public void logIn(View view) {
         Intent intent = new Intent(this, MenuActivity.class);
         startActivity(intent);
     }
-
-//    public void makeMultipleRequest(){
-//
-//        String [] endpoints = {
-//                "/mobileCallsInfo",
-//                "/mobileContacts",
-//                "/mobileEndlineTemplates",
-//                "/mobileKeywords",
-//                "/mobileSettings",
-//                "/mobileSmsTemplates"
-//        };
-//
-//        for (int i = 0; i < endpoints.length; i++){
-//            try {
-//                String url = BACKEND_SITE + endpoints[i]
-//                        + "?" + URL_PARAMS_TOKEN + TOKEN;
-//                CountDownLatch countDownLatch = new CountDownLatch(1);
-//                makeRequest(url, countDownLatch);
-//                if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
-//                    throw new TimeoutException();
-//                }
-//                if (gotResponse) {
-//                    try {
-//                        System.out.println(responseFromServer);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            } catch (Exception e){
-//                e.printStackTrace();
-//            }
-//        }
-//
-//    }
 }

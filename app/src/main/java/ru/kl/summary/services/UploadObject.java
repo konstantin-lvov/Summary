@@ -22,6 +22,8 @@ public class UploadObject {
 
     private static Storage storage;
     private static Thread t;
+    private static String CREDENTIALS_JSON = "silver-aurora-294418-d77aac96179e.json";
+    private static String GOOGLE_API_LINK = "https://www.googleapis.com/auth/cloud-platform";
 
     public static void uploadObject(
             String projectId, String bucketName, String objectName, String filePath) throws IOException {
@@ -29,10 +31,9 @@ public class UploadObject {
         Storage setup
          */
         ;
-        GoogleCredentials credentials = GoogleCredentials.fromStream(MyApp.getContext().getAssets().open("silver-aurora-294418-d77aac96179e.json"))
-                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+        GoogleCredentials credentials = GoogleCredentials.fromStream(MyApp.getContext().getAssets().open(CREDENTIALS_JSON))
+                .createScoped(Lists.newArrayList(GOOGLE_API_LINK));
         storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage = StorageOptions.newBuilder().setProjectId(projectId).build().getService();
         BlobId blobId = BlobId.of(bucketName, objectName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
 
@@ -55,7 +56,6 @@ public class UploadObject {
             }
         };
         t.start();
-
         System.out.println(
                 "File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
     }

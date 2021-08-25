@@ -1,6 +1,7 @@
 package ru.kl.summary;
 
 
+import android.app.Application;
 import android.content.Intent;
 import android.graphics.Color;
 import android.view.Gravity;
@@ -76,18 +77,17 @@ public class MenuActivity extends AppCompatActivity {
 
     public void onOffRecording(View view) throws IOException {
         if(this.onOfSwitch.isChecked()){
-            System.out.println(this.onOfSwitch.isActivated());
             this.switchTextView.setTextColor(Color.GREEN);
             this.switchTextView.setText("ON");
 
             audioRecordHandler.startRecording();
+            infoTextView.setText(audioRecordHandler.getErrorResult());
         } else {
-            System.out.println(this.onOfSwitch.isActivated());
             this.switchTextView.setTextColor(Color.RED);
             this.switchTextView.setText("OFF");
 
             audioRecordHandler.stopRecording();
-            infoTextView.setText(audioRecordHandler.getFilename());
+            //infoTextView.setText(audioRecordHandler.getFilename());
 
             String nameOfUploadedObject = "record-" + audioRecordHandler.getCurrentAudioFileName();
             UploadObject uploadObject = new UploadObject();
@@ -95,8 +95,6 @@ public class MenuActivity extends AppCompatActivity {
                     nameOfUploadedObject, audioRecordHandler.getCurrentAudioFilePath());
             uploadObject.stopThread();
         }
-//        Intent intent = new Intent(this, SettingsActivity.class);
-//        startActivity(intent);
     }
 
     public void goToContacts(View view){
