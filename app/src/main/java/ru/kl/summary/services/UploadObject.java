@@ -29,7 +29,7 @@ public class UploadObject {
         Storage setup
          */
         ;
-        GoogleCredentials credentials = GoogleCredentials.fromStream(MyApp.getContext().getAssets().open("silver-aurora-294418-d77aac96179e.json"))
+        GoogleCredentials credentials = GoogleCredentials.fromStream(MyApp.getContext().getAssets().open("silver-aurora-294418-6155098d5a51.json"))
                 .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
         storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 //        storage = StorageOptions.newBuilder().setProjectId(projectId).build().getService();
