@@ -1,13 +1,19 @@
 package ru.kl.summary;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONObject;
 import ru.kl.summary.services.GetHandler;
 import ru.kl.summary.services.TokenHandler;
@@ -22,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView organizationName;
     private TextView password;
     private Button login;
-
+    private View snackView;
 
     private final String ASSETS_PROPERTIES_FILE_NAME = "app.properties";
     private final String INTERNAL_DIR_PROPERTIES_FILE_NAME = "runtime.properties";
@@ -34,7 +40,22 @@ public class MainActivity extends AppCompatActivity {
     private final String URL_PARAMS_ORG = "organization=";
     private final String URL_PARAMS_PAS = "password=";
 
-
+    private String[] neededPermissions = {
+            "android.permission.CALL_PHONE",
+            "android.permission.PROCESS_OUTGOING_CALLS",
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.RECORD_AUDIO",
+            "android.permission.MODIFY_AUDIO_SETTINGS",
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+    };
+    private String[] permissionsToRequest = {
+            "Manifest.permission.CALL_PHONE",
+            "Manifest.permission.PROCESS_OUTGOING_CALLS",
+            "Manifest.permission.READ_PHONE_STATE",
+            "Manifest.permission.RECORD_AUDIO",
+            "Manifest.permission.MODIFY_AUDIO_SETTINGS",
+            "Manifest.permission.WRITE_EXTERNAL_STORAGE"
+    };
     private String BACKEND_SITE;
     private String TOKEN;
 
@@ -46,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     String internalDirPropFileContext;
 
     GetHandler getHandler = null;
+
+    private int REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +179,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logIn(View view) {
+
+
+//        for (int i = 0; i < neededPermissions.length; i++) {
+//            if (ContextCompat.checkSelfPermission(
+//                    MyApp.getContext(), neededPermissions[i]) ==
+//                    PackageManager.PERMISSION_GRANTED) {
+//                // You can use the API that requires the permission.
+//                System.out.println(neededPermissions[i] + " permission granted.");
+//                ;
+////            } else if (shouldShowRequestPermissionRationale(...)) {
+////                // In an educational UI, explain to the user why your app requires this
+////                // permission for a specific feature to behave as expected. In this UI,
+////                // include a "cancel" or "no thanks" button that allows the user to
+////                // continue using your app without granting the permission.
+////                showInContextUI(...);
+//            } else {
+//                // You can directly ask for the permission.
+//                ActivityCompat.requestPermissions(this,
+//                        new String [] {permissionsToRequest [i]},
+//                        REQUEST_CODE);
+//            }
+//        }
+
+
         Intent intent = new Intent(this, MenuActivity.class);
         startActivity(intent);
     }

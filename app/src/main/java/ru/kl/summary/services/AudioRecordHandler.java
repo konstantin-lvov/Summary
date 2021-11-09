@@ -70,7 +70,7 @@ public class AudioRecordHandler {
     };
 
     public String getFilename() {
-        String filepath = MyApp.getContext().getFilesDir().getPath();
+        String filepath = MyApp.getContext().getExternalFilesDir(null).getPath();//getFilesDir().getPath();
         File dir = new File(filepath, AUDIO_RECORDER_FOLDER);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -87,7 +87,8 @@ public class AudioRecordHandler {
     public void startRecording() {
         CurrentAudioFilePath = getFilename();
         recorder = new MediaRecorder();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        int mic = MediaRecorder.AudioSource.MIC;
+        recorder.setAudioSource(mic);
         recorder.setOutputFormat(output_formats[currentFormat]);
         //recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         recorder.setAudioEncoder(encoder);
