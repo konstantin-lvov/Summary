@@ -4,6 +4,9 @@ import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
 import com.google.common.collect.Lists;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import ru.kl.summary.MyApp;
 
 import java.io.File;
@@ -24,6 +27,8 @@ public class UploadObject {
     private static Thread t;
     private static String CREDENTIALS_JSON = "silver-aurora-294418-ae39bc3e8abe.json";
     private static String GOOGLE_API_LINK = "https://www.googleapis.com/auth/cloud-platform";
+    private static String URL_PARAMS_TOKEN = "token=";
+    private static String POST_RECORD_ENPOINT = "/newAudioRecord";
 
     public static void uploadObject(
             String projectId, String bucketName, String objectName, String filePath) throws IOException {
@@ -58,6 +63,26 @@ public class UploadObject {
         t.start();
         System.out.println(
                 "File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
+
+        String url = BackendUrlResolver.getBackendUrl();
+        TokenHandler tokenHandler = new TokenHandler();
+        String TOKEN = "";
+        try {
+            TOKEN = tokenHandler.getToken();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        url += POST_RECORD_ENPOINT + "?" + URL_PARAMS_TOKEN + TOKEN;
+//        RequestBody formBody = new FormBody.Builder()
+//                .add("recordFileName", objectName)
+//                .build();
+        String json = "{\"recordFileName\":\"" + objectName + "\"}";
+        RequestBody formBody  = RequestBody.create(json,
+                MediaType.parse("application/json"));
+
+        PostHandler postHandler = new PostHandler();
+        postHandler.makeRequest(url, formBody);
+        postHandler.stop();
     }
 
     public static Set<String> listFilesUsingJavaIO(String dir) {

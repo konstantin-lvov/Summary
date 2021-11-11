@@ -19,10 +19,6 @@ public class TokenHandler extends AppCompatActivity{
 
     public String getToken() throws IOException {
 
-
-        Context context = MyApp.getContext();
-        InputStream is = context.getAssets().open(ASSETS_PROPERTIES_FILE_NAME);
-
         final File propertiesFile = new File(MyApp.getContext().getFilesDir(), INTERNAL_DIR_PROPERTIES_FILE_NAME);
 
         if (propertiesFile.exists()) {
@@ -44,7 +40,6 @@ public class TokenHandler extends AppCompatActivity{
 
         try{
             File file = new File(internalDirPropFileContext);
-            System.out.println("TOKENHANDLER INTERNAL DIR FILE EXIST - " + file.exists());
             Scanner scanner = new Scanner(internalDirPropFileContext);
             while (scanner.hasNextLine()) {
                 tmpNextLIne = scanner.nextLine();

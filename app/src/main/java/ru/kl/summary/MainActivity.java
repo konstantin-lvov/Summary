@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONObject;
+import ru.kl.summary.services.BackendUrlResolver;
 import ru.kl.summary.services.GetHandler;
 import ru.kl.summary.services.TokenHandler;
 
@@ -30,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
     private Button login;
     private View snackView;
 
-    private final String ASSETS_PROPERTIES_FILE_NAME = "app.properties";
+
     private final String INTERNAL_DIR_PROPERTIES_FILE_NAME = "runtime.properties";
-    private final String BACKEND_SITE_PROPERTIES_NAME = "backend.site";
+
     private final String TOKEN_PROPERTIES_NAME = "auth.token";
     private final String URL_LOGIN_ENDPOINT = "/mobileLogin";
     private final String URL_TOKEN_LOGIN_ENDPOINT = "/mobileTokenLogin";
@@ -40,24 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private final String URL_PARAMS_ORG = "organization=";
     private final String URL_PARAMS_PAS = "password=";
 
-    private String[] neededPermissions = {
-            "android.permission.CALL_PHONE",
-            "android.permission.PROCESS_OUTGOING_CALLS",
-            "android.permission.READ_PHONE_STATE",
-            "android.permission.RECORD_AUDIO",
-            "android.permission.MODIFY_AUDIO_SETTINGS",
-            "android.permission.WRITE_EXTERNAL_STORAGE"
-    };
-    private String[] permissionsToRequest = {
-            "Manifest.permission.CALL_PHONE",
-            "Manifest.permission.PROCESS_OUTGOING_CALLS",
-            "Manifest.permission.READ_PHONE_STATE",
-            "Manifest.permission.RECORD_AUDIO",
-            "Manifest.permission.MODIFY_AUDIO_SETTINGS",
-            "Manifest.permission.WRITE_EXTERNAL_STORAGE"
-    };
-    private String BACKEND_SITE;
     private String TOKEN;
+    private String BACKEND_SITE;
 
     private String tmpNextLIne;
 
@@ -73,30 +58,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         final File propertiesFile = new File(getBaseContext().getFilesDir(), INTERNAL_DIR_PROPERTIES_FILE_NAME);
-        Context context = getApplicationContext();
-        try {
-            InputStream is = context.getAssets().open(ASSETS_PROPERTIES_FILE_NAME);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            assetsPropFileContext = new String(buffer);
-            System.out.println(assetsPropFileContext);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            Scanner scanner = new Scanner(assetsPropFileContext);
-            while (scanner.hasNextLine()) {
-                tmpNextLIne = scanner.nextLine();
-                if (tmpNextLIne.contains(BACKEND_SITE_PROPERTIES_NAME)) {
-                    BACKEND_SITE = tmpNextLIne.split("=")[1];
-                    addressOfSiteExist = true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        BACKEND_SITE = BackendUrlResolver.getBackendUrl();
+
         TokenHandler tokenHandler = new TokenHandler();
         try {
             TOKEN = tokenHandler.getToken();
