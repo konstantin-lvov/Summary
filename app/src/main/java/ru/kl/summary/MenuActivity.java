@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.snackbar.Snackbar;
 import ru.kl.summary.services.AudioRecordHandler;
+import ru.kl.summary.services.RawAudioRecorder;
 import ru.kl.summary.services.UploadObject;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class MenuActivity extends AppCompatActivity {
     TextView infoTextView;
 
     AudioRecordHandler audioRecordHandler;
+//    RawAudioRecorder rawAudioRecorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,10 @@ public class MenuActivity extends AppCompatActivity {
 
         audioRecordHandler = new AudioRecordHandler();
         audioRecordHandler.setSpeakerOn();
+
+//        rawAudioRecorder = new RawAudioRecorder();
+        //rawAudioRecorder.setSpeakerOn();
+
 
 
         infoTextView = findViewById(R.id.infoTextView);
@@ -87,19 +93,27 @@ public class MenuActivity extends AppCompatActivity {
             this.switchTextView.setText("ON");
 
             audioRecordHandler.startRecording();
-            infoTextView.setText(audioRecordHandler.getErrorResult());
+//            infoTextView.setText(audioRecordHandler.getErrorResult());
+//            rawAudioRecorder.startRecorder(infoTextView);
         } else {
             this.switchTextView.setTextColor(Color.RED);
             this.switchTextView.setText("OFF");
 
             audioRecordHandler.stopRecording();
-            //infoTextView.setText(audioRecordHandler.getFilename());
+            infoTextView.setText(audioRecordHandler.getCurrentAudioFileName());
+//            rawAudioRecorder.stopRecorder();
 
-            String nameOfUploadedObject = "record-" + audioRecordHandler.getCurrentAudioFileName();
+            String nameOfUploadedObject = "record" + audioRecordHandler.getCurrentAudioFileName();
             UploadObject uploadObject = new UploadObject();
-            uploadObject.uploadObject("silver-aurora-294418", "summary-storage",
+            uploadObject.uploadObject("silver-aurora-294418", "summaryapp",
                     nameOfUploadedObject, audioRecordHandler.getCurrentAudioFilePath());
             uploadObject.stopThread();
+
+//                        String nameOfUploadedObject = "record-" + rawAudioRecorder.getCurrentAudioFileName();
+//            UploadObject uploadObject = new UploadObject();
+//            uploadObject.uploadObject("silver-aurora-294418", "summary-storage",
+//                    nameOfUploadedObject, rawAudioRecorder.getCurrentAudioFilePath());
+//            uploadObject.stopThread();
         }
     }
 

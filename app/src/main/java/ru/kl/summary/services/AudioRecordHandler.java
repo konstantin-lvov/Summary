@@ -1,7 +1,9 @@
 package ru.kl.summary.services;
 
 import android.content.Context;
+import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
@@ -27,15 +29,16 @@ public class AudioRecordHandler {
     private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
     private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
     private static final String AUDIO_RECORDER_FILE_EXT_AWB = ".awb";
+    private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
     private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
 
     private MediaRecorder recorder = null;
-    private int currentFormat = 0;
+    private int currentFormat = 3;
     private int output_formats[] = {MediaRecorder.OutputFormat.AMR_WB, MediaRecorder.OutputFormat.MPEG_4,
-            MediaRecorder.OutputFormat.THREE_GPP};
+            MediaRecorder.OutputFormat.THREE_GPP, MediaRecorder.OutputFormat.AAC_ADTS};
     private String file_exts[] = {AUDIO_RECORDER_FILE_EXT_AWB, AUDIO_RECORDER_FILE_EXT_MP4,
-            AUDIO_RECORDER_FILE_EXT_3GP};
-    private int encoder = MediaRecorder.AudioEncoder.AMR_WB;
+            AUDIO_RECORDER_FILE_EXT_3GP, AUDIO_RECORDER_FILE_EXT_WAV};
+    private int encoder = MediaRecorder.AudioEncoder.AAC;
     private int sampleRate = 16000;
     private String CurrentAudioFileName = "";
     private String CurrentAudioFilePath = "";
@@ -89,10 +92,9 @@ public class AudioRecordHandler {
         recorder = new MediaRecorder();
         int mic = MediaRecorder.AudioSource.MIC;
         recorder.setAudioSource(mic);
-        recorder.setOutputFormat(output_formats[currentFormat]);
-        //recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setAudioEncoder(encoder);
-        recorder.setAudioSamplingRate(sampleRate);
+        recorder.setOutputFormat(output_formats[currentFormat]); //MediaRecorder.OutputFormat.AAC_ADTS
+        recorder.setAudioEncoder(encoder); //MediaRecorder.AudioEncoder.AAC;
+        recorder.setAudioSamplingRate(sampleRate); //16000
         recorder.setOutputFile(CurrentAudioFilePath);
         recorder.setOnErrorListener(errorListener);
         recorder.setOnInfoListener(infoListener);

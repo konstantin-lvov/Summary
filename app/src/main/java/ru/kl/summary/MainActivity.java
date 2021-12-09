@@ -69,10 +69,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if (!addressOfSiteExist) {
-            //надо сделать страницу с вводом желаемого сервера
-            System.out.println("Address of site does not exist. Please enter address.");
-        }
         if (tokenExist) {
             System.out.println("token exist, making test request" + TOKEN);
             try {
