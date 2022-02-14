@@ -1,0 +1,1178 @@
+package ru.kl.summary;
+
+
+public class MyApp extends Application {
+    private static MyApp instance;
+
+    public static MyApp getInstance() {
+        return instance;
+    }
+
+    public static Context getContext(){
+        return instance.getApplicationContext();
+    }
+
+    @Override
+    public void onCreate() {
+        instance = this;
+        super.onCreate();
+    }
+
+}
+package ru.kl.summary;
+
+
+public class TemplatesActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_templates);
+    }
+}package ru.kl.summary;
+
+
+public class KeywordsActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_keywords);
+    }
+}
+package ru.kl.summary;
+
+
+public class EndlinesActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_endlines);
+    }
+}
+package ru.kl.summary;
+
+
+
+public class MainActivity extends AppCompatActivity {
+    private TextView organizationName;
+    private TextView password;
+    private Button login;
+    private View snackView;
+
+
+    private final String INTERNAL_DIR_PROPERTIES_FILE_NAME = "runtime.properties";
+
+    private final String TOKEN_PROPERTIES_NAME = "auth.token";
+    private final String URL_LOGIN_ENDPOINT = "/mobileLogin";
+    private final String URL_TOKEN_LOGIN_ENDPOINT = "/mobileTokenLogin";
+    private final String URL_PARAMS_TOKEN = "token=";
+    private final String URL_PARAMS_ORG = "organization=";
+    private final String URL_PARAMS_PAS = "password=";
+
+    private String TOKEN;
+    private String BACKEND_SITE;
+
+    private String tmpNextLIne;
+
+    boolean tokenExist = false;
+    boolean addressOfSiteExist = false;
+    String assetsPropFileContext;
+    String internalDirPropFileContext;
+
+    GetHandler getHandler = null;
+
+    private int REQUEST_CODE = 1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        final File propertiesFile = new File(getBaseContext().getFilesDir(), INTERNAL_DIR_PROPERTIES_FILE_NAME);
+
+        BACKEND_SITE = BackendUrlResolver.getBackendUrl();
+
+        TokenHandler tokenHandler = new TokenHandler();
+        try {
+            TOKEN = tokenHandler.getToken();
+            tokenExist = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (tokenExist) {
+            System.out.println("token exist, making test request" + TOKEN);
+            try {
+                CountDownLatch countDownLatch = new CountDownLatch(1);
+                String url = BACKEND_SITE + URL_TOKEN_LOGIN_ENDPOINT
+                        + "?" + URL_PARAMS_TOKEN + TOKEN;
+                getHandler = new GetHandler(url, countDownLatch);
+                getHandler.makeRequest();
+                if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
+                    throw new TimeoutException();
+                }
+                if (getHandler.isGotResponse()) {
+                    try {
+                        if (getHandler.getResponseFromServer().equals("OK")) {
+                            logIn(new View(this.getBaseContext()));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ImageView topLabel = findViewById(R.id.topLabel);
+        ImageView background = findViewById(R.id.background);
+        organizationName = findViewById(R.id.organizationName);
+        password = findViewById(R.id.password_logo);
+        login = findViewById(R.id.login);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (organizationName.getText().toString().toCharArray().length > 1
+                        && password.getText().toString().toCharArray().length > 1) {
+                    String url = BACKEND_SITE + URL_LOGIN_ENDPOINT
+                            + "?" + URL_PARAMS_ORG + organizationName.getText().toString()
+                            + "&" + URL_PARAMS_PAS + password.getText().toString();
+                    try {
+                        CountDownLatch countDownLatch = new CountDownLatch(1);
+                        getHandler = new GetHandler(url, countDownLatch);
+                        getHandler.makeRequest();
+                        if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
+                            throw new TimeoutException();
+                        }
+                        if (getHandler.isGotResponse()) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(getHandler.getResponseFromServer());
+                                TOKEN = jsonObject.getString("token");
+                                FileWriter writer = new FileWriter(propertiesFile);
+                                writer.write(TOKEN_PROPERTIES_NAME + "=" + TOKEN + "\n");
+                                writer.flush();
+                                writer.close();
+                                logIn(view);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                }
+            }
+        });
+    }
+
+    public void logIn(View view) {
+
+
+//        for (int i = 0; i < neededPermissions.length; i++) {
+//            if (ContextCompat.checkSelfPermission(
+//                    MyApp.getContext(), neededPermissions[i]) ==
+//                    PackageManager.PERMISSION_GRANTED) {
+//                // You can use the API that requires the permission.
+//                System.out.println(neededPermissions[i] + " permission granted.");
+//                ;
+////            } else if (shouldShowRequestPermissionRationale(...)) {
+////                // In an educational UI, explain to the user why your app requires this
+////                // permission for a specific feature to behave as expected. In this UI,
+////                // include a "cancel" or "no thanks" button that allows the user to
+////                // continue using your app without granting the permission.
+////                showInContextUI(...);
+//            } else {
+//                // You can directly ask for the permission.
+//                ActivityCompat.requestPermissions(this,
+//                        new String [] {permissionsToRequest [i]},
+//                        REQUEST_CODE);
+//            }
+//        }
+
+
+        Intent intent = new Intent(this, MenuActivity.class);
+        startActivity(intent);
+    }
+}package ru.kl.summary;
+
+
+
+public class CallsInfoActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_calls_info);
+        TextView textView = findViewById(R.id.CallsInfoTextView);
+        textView.setMovementMethod(new ScrollingMovementMethod());
+        Button backButton = findViewById(R.id.CallsInfoBackButton);
+        backButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                goToMainActivity(view);
+            }
+        });
+
+        RequestHandler requestHandler = new RequestHandler();
+        JSONArray jsonArray = requestHandler.GETRequest("/mobileCallsInfo");
+
+        System.out.println(jsonArray.toString());
+        System.out.println("json array length " + jsonArray.length());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < jsonArray.length(); i++){
+            try {
+                JSONObject tmpJSONObject = jsonArray.getJSONObject(i);
+                Date date = new Date(Long.valueOf(tmpJSONObject.getString("date")));
+                stringBuilder.append("Дата разговора: " + date.toString() + "\n");
+                stringBuilder.append("Номер телефона: " + tmpJSONObject.getString("phoneNumber") + "\n");
+                stringBuilder.append("Текст СМС: " + tmpJSONObject.getString("parsedSms") + "\n\n");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        textView.setText(stringBuilder.toString());
+    }
+
+    public void goToMainActivity(View view){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+}
+package ru.kl.summary;
+
+
+
+
+public class MenuActivity extends AppCompatActivity {
+
+    private TextView message;
+    private int counter = 0;
+    TextView switchTextView;
+    Switch onOfSwitch;
+    Button contacts;
+    Button callsInfo;
+    TextView infoTextView;
+
+    AudioRecordHandler audioRecordHandler;
+//    RawAudioRecorder rawAudioRecorder;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_menu);
+        ImageView topLabel = findViewById(R.id.topLabel);
+        ImageView background = findViewById(R.id.background);
+
+        audioRecordHandler = new AudioRecordHandler();
+        audioRecordHandler.setSpeakerOn();
+
+//        rawAudioRecorder = new RawAudioRecorder();
+        //rawAudioRecorder.setSpeakerOn();
+
+
+
+        infoTextView = findViewById(R.id.infoTextView);
+
+        switchTextView = findViewById(R.id.switchTextView);
+        switchTextView.setGravity(Gravity.CENTER);
+        switchTextView.setTextColor(Color.RED);
+
+        onOfSwitch = findViewById(R.id.OnOfSwitch);
+        onOfSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    onOffRecording(view);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        contacts = findViewById(R.id.contacts);
+        contacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToContacts(view);
+            }
+        });
+
+        callsInfo = findViewById(R.id.callsInfo);
+        callsInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToCallsInfo(view);
+            }
+        });
+
+    }
+
+    public void onOffRecording(View view) throws IOException {
+        if (this.onOfSwitch.isChecked()) {
+            this.switchTextView.setTextColor(Color.GREEN);
+            this.switchTextView.setText("ON");
+
+            audioRecordHandler.startRecording();
+//            infoTextView.setText(audioRecordHandler.getErrorResult());
+//            rawAudioRecorder.startRecorder(infoTextView);
+        } else {
+            this.switchTextView.setTextColor(Color.RED);
+            this.switchTextView.setText("OFF");
+
+            audioRecordHandler.stopRecording();
+            infoTextView.setText(audioRecordHandler.getCurrentAudioFileName());
+//            rawAudioRecorder.stopRecorder();
+
+            String nameOfUploadedObject = "record" + audioRecordHandler.getCurrentAudioFileName();
+            UploadObject uploadObject = new UploadObject();
+            uploadObject.uploadObject("silver-aurora-294418", "summaryapp",
+                    nameOfUploadedObject, audioRecordHandler.getCurrentAudioFilePath());
+            uploadObject.stopThread();
+
+//                        String nameOfUploadedObject = "record-" + rawAudioRecorder.getCurrentAudioFileName();
+//            UploadObject uploadObject = new UploadObject();
+//            uploadObject.uploadObject("silver-aurora-294418", "summary-storage",
+//                    nameOfUploadedObject, rawAudioRecorder.getCurrentAudioFilePath());
+//            uploadObject.stopThread();
+        }
+    }
+
+    public void goToContacts(View view) {
+        Intent intent = new Intent(this, ContactsActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToCallsInfo(View view) {
+        Intent intent = new Intent(this, CallsInfoActivity.class);
+        startActivity(intent);
+    }
+
+
+
+}
+package ru.kl.summary;
+
+
+
+public class ContactsActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_contacts);
+        TextView textView = findViewById(R.id.ContactsTextView);
+        textView.setMovementMethod(new ScrollingMovementMethod());
+        Button backButton = findViewById(R.id.ContactsBackButton);
+        backButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                goToMainActivity(view);
+            }
+        });
+
+        RequestHandler requestHandler = new RequestHandler();
+        JSONArray jsonArray = requestHandler.GETRequest("/mobileContacts");
+
+        System.out.println(jsonArray.toString());
+        System.out.println("json array length " + jsonArray.length());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < jsonArray.length(); i++){
+            try {
+                JSONObject tmpJSONObject = jsonArray.getJSONObject(i);
+                stringBuilder.append(i+1 + ": " + tmpJSONObject.getString("contact") + "\n");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        textView.setText(stringBuilder.toString());
+    }
+
+    public void goToMainActivity(View view){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+}
+package ru.kl.summary;
+
+
+public class SetupActivity extends AppCompatActivity {
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setup);
+
+    }
+
+}
+package ru.kl.summary.services;
+
+
+
+
+public class RawAudioRecorder {
+
+    AudioRecord audioRecord;
+    Boolean isRecording = true;
+    private int sampleRate = 16000;
+    private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    private String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+    //int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+    int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
+    int BytesPerElement = 2; // 2 bytes in 16bit format
+    byte data[] = new byte[BufferElements2Rec * BytesPerElement];
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    private String currentAudioFileName = "";
+    private String currentAudioFilePath = "";
+    AudioManager audioManager;
+    Thread rawAudioRecordThread = null;
+
+    public void setSpeakerOn() {
+        audioManager = (AudioManager) MyApp.getContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_CALL);
+        audioManager.setSpeakerphoneOn(true);
+    }
+
+    public void startRecorder(TextView infoTextView) {
+        isRecording = true;
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, BufferElements2Rec * BytesPerElement);
+        currentAudioFilePath = this.getFilename();
+        infoTextView.append("Start recording\n");
+        infoTextView.append(BufferElements2Rec * BytesPerElement+"\n");
+        rawAudioRecordThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                FileOutputStream os = null;
+                try {
+                    os = new FileOutputStream(currentAudioFilePath);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    infoTextView.append(e.getMessage());
+                }
+                while (isRecording) {
+                    audioRecord.read(data, 0, data.length);
+                    try {
+                        os.write(data, 0, BufferElements2Rec * BytesPerElement);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        infoTextView.append(e.getMessage());
+                    }
+                }
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    infoTextView.append(e.getMessage());
+                }
+            }
+        });
+        rawAudioRecordThread.start();
+    }
+
+    public void stopRecorder() {
+        isRecording = false;
+        if (audioRecord != null) {
+            isRecording = false;
+            audioRecord.stop();
+            audioRecord.release();
+            audioRecord = null;
+            rawAudioRecordThread = null;
+        }
+    }
+
+    public String getFilename() {
+        String filepath = MyApp.getContext().getExternalFilesDir(null).getPath();// /.../internal/
+        File dir = new File(filepath, AUDIO_RECORDER_FOLDER);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return (dir.getAbsolutePath() + "/" + System.currentTimeMillis() + ".pcm");
+    }
+
+    public String getCurrentAudioFileName() {
+        String[] splittedPath = currentAudioFilePath.split("/");
+        currentAudioFileName = splittedPath[splittedPath.length - 1];
+        return currentAudioFileName;
+    }
+
+    public String getCurrentAudioFilePath() {
+        return currentAudioFilePath;
+    }
+
+}package ru.kl.summary.services;
+
+
+public class FileSystemReader {
+
+    public void printListOfFiles(){
+        String [] ls = MyApp.getContext().getFilesDir().list();
+        System.out.println("list of files " + ls.length);
+        for (int i = 0; i < ls.length; i++){
+            System.out.println(ls [i]);
+        }
+    }
+}
+package ru.kl.summary.services;
+
+
+
+public class InternalResourcesHandler {
+
+    private final String ASSETS_PROPERTIES_FILE_NAME = "app.properties";
+
+    public InternalResourcesHandler (){}
+
+    public String getAssetsPropFileName (){
+        return ASSETS_PROPERTIES_FILE_NAME;
+    }
+
+    public String getAssetsPropFileContext (){
+        String assetsPropFileContext = "";
+        try {
+            InputStream is = MyApp.getContext().getAssets().open(ASSETS_PROPERTIES_FILE_NAME);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            assetsPropFileContext = new String(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return assetsPropFileContext;
+    }
+}
+package ru.kl.summary.services;
+
+
+
+public class RequestHandler {
+
+    private final String ASSETS_PROPERTIES_FILE_NAME = "app.properties";
+    private final String BACKEND_SITE_PROPERTIES_NAME = "backend.site";
+
+    String backendSite;
+    String assetsPropFileContext;
+
+    boolean addressOfSiteExist = false;
+
+    public RequestHandler(){
+        try {
+            InputStream is = MyApp.getContext().getAssets().open(ASSETS_PROPERTIES_FILE_NAME);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            assetsPropFileContext = new String(buffer);
+
+            Scanner scanner = new Scanner(assetsPropFileContext);
+            String tmpNextLIne;
+            while (scanner.hasNextLine()) {
+                tmpNextLIne = scanner.nextLine();
+                if (tmpNextLIne.contains(BACKEND_SITE_PROPERTIES_NAME)) {
+                    backendSite = tmpNextLIne.split("=")[1];
+                    addressOfSiteExist = true;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public JSONArray GETRequest(String urlEndpoint){
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        GetHandler getHandler = null;
+        JSONArray jsonArray = null;
+        TokenHandler tokenHandler = new TokenHandler();
+
+        try {
+            String token = tokenHandler.getToken();
+
+            String url = backendSite + urlEndpoint
+                    + "?" + "token=" + token;
+            getHandler = new GetHandler(url, countDownLatch);
+            getHandler.makeRequest();
+            if(!countDownLatch.await(5, TimeUnit.SECONDS)){
+                throw new TimeoutException();
+            }
+            if (getHandler.isGotResponse()) {
+                String clearJson = getHandler.getResponseFromServer();
+                jsonArray = new JSONArray(clearJson);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return jsonArray;
+    }
+}
+package ru.kl.summary.services;
+
+
+
+public class AudioRecordHandler {
+    public static String getErrorResult() {
+        return errorResult;
+    }
+
+    private static String errorResult = "";
+
+    //Call Recording varibales
+    private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
+    private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
+    private static final String AUDIO_RECORDER_FILE_EXT_AWB = ".awb";
+    private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
+    private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+
+    private MediaRecorder recorder = null;
+    private int currentFormat = 3;
+    private int output_formats[] = {MediaRecorder.OutputFormat.AMR_WB, MediaRecorder.OutputFormat.MPEG_4,
+            MediaRecorder.OutputFormat.THREE_GPP, MediaRecorder.OutputFormat.AAC_ADTS};
+    private String file_exts[] = {AUDIO_RECORDER_FILE_EXT_AWB, AUDIO_RECORDER_FILE_EXT_MP4,
+            AUDIO_RECORDER_FILE_EXT_3GP, AUDIO_RECORDER_FILE_EXT_WAV};
+    private int encoder = MediaRecorder.AudioEncoder.AAC;
+    private int sampleRate = 16000;
+    private String CurrentAudioFileName = "";
+    private String CurrentAudioFilePath = "";
+
+    AudioManager audioManager;
+
+    public String getCurrentAudioFileName() {
+        String[] splittedPath = CurrentAudioFilePath.split("/");
+        CurrentAudioFileName = splittedPath[splittedPath.length - 1];
+        return CurrentAudioFileName;
+    }
+
+    public String getCurrentAudioFilePath() {
+        return CurrentAudioFilePath;
+    }
+
+    private MediaRecorder.OnErrorListener errorListener = new MediaRecorder.OnErrorListener() {
+        @Override
+        public void onError(MediaRecorder mr, int what, int extra) {
+            Toast.makeText(MyApp.getContext(),
+                    "Error: " + what + ", " + extra, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private MediaRecorder.OnInfoListener infoListener = new MediaRecorder.OnInfoListener() {
+        @Override
+        public void onInfo(MediaRecorder mr, int what, int extra) {
+            Toast.makeText(MyApp.getContext(),
+                            "Warning: " + what + ", " + extra, Toast.LENGTH_SHORT)
+                    .show();
+        }
+    };
+
+    public String getFilename() {
+        String filepath = MyApp.getContext().getExternalFilesDir(null).getPath();//getFilesDir().getPath();
+        File dir = new File(filepath, AUDIO_RECORDER_FOLDER);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return (dir.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
+    }
+
+    public void setSpeakerOn() {
+        audioManager = (AudioManager) MyApp.getContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_CALL);
+        audioManager.setSpeakerphoneOn(true);
+    }
+
+    public void startRecording() {
+        CurrentAudioFilePath = getFilename();
+        recorder = new MediaRecorder();
+        int mic = MediaRecorder.AudioSource.MIC;
+        recorder.setAudioSource(mic);
+        recorder.setOutputFormat(output_formats[currentFormat]); //MediaRecorder.OutputFormat.AAC_ADTS
+        recorder.setAudioEncoder(encoder); //MediaRecorder.AudioEncoder.AAC;
+        recorder.setAudioSamplingRate(sampleRate); //16000
+        recorder.setOutputFile(CurrentAudioFilePath);
+        recorder.setOnErrorListener(errorListener);
+        recorder.setOnInfoListener(infoListener);
+        try {
+            recorder.prepare();
+            recorder.start();
+        } catch (IllegalStateException e) {
+            errorResult = e.getMessage();
+            Log.e("REDORDING :: ", e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            errorResult = e.getMessage();
+            Log.e("REDORDING :: ", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void stopRecording() {
+        audioManager.setSpeakerphoneOn(false);
+        try {
+            if (null != recorder) {
+                recorder.stop();
+                recorder.reset();
+                recorder.release();
+
+                recorder = null;
+            }
+        } catch (RuntimeException stopException) {
+        }
+    }
+
+
+}
+package ru.kl.summary.services;
+
+
+
+public class TokenHandler extends AppCompatActivity{
+
+    private final String ASSETS_PROPERTIES_FILE_NAME = "app.properties";
+    private final String INTERNAL_DIR_PROPERTIES_FILE_NAME = "runtime.properties";
+    private final String TOKEN_PROPERTIES_NAME = "auth.token";
+    String internalDirPropFileContext;
+    private String TOKEN;
+    private String tmpNextLIne;
+    boolean tokenExist = false;
+
+    public String getToken() throws IOException {
+
+        final File propertiesFile = new File(MyApp.getContext().getFilesDir(), INTERNAL_DIR_PROPERTIES_FILE_NAME);
+
+        if (propertiesFile.exists()) {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(propertiesFile));
+                StringBuilder text = new StringBuilder();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    text.append(line);
+                    text.append('\n');
+                }
+                bufferedReader.close();
+                internalDirPropFileContext = text.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try{
+            File file = new File(internalDirPropFileContext);
+            Scanner scanner = new Scanner(internalDirPropFileContext);
+            while (scanner.hasNextLine()) {
+                tmpNextLIne = scanner.nextLine();
+                if (tmpNextLIne.contains(TOKEN_PROPERTIES_NAME)) {
+                    TOKEN = tmpNextLIne.split("=")[1];
+                    tokenExist = true;
+                }
+
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return TOKEN;
+    }
+}
+package ru.kl.summary.services;
+
+
+
+
+public class PostHandler {
+    Thread t;
+    OkHttpClient client = new OkHttpClient();
+    Response response = null;
+
+    public PostHandler (){}
+
+    public Response makeRequest(String url, RequestBody formBody){
+
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(formBody)
+                .build();
+
+        t = new Thread(){
+            public void run (){
+                try {
+                    response = client.newCall(request).execute();
+                    while (t != null){
+                        t.sleep(100);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException ie) {
+                    ie.printStackTrace();
+                }
+            }
+        };
+        t.start();
+        return response;
+    }
+
+    public void stop(){
+        t = null;
+    }
+
+}
+package ru.kl.summary.services;
+
+
+public class BackendUrlResolver {
+
+    private static final String BACKEND_SITE_PROPERTIES_NAME = "backend.site";
+
+    public BackendUrlResolver (){}
+
+    public static String getBackendUrl (){
+        String url = "";
+        InternalResourcesHandler internalResourcesHandler = new InternalResourcesHandler();
+        try {
+            Scanner scanner = new Scanner(internalResourcesHandler.getAssetsPropFileContext());
+            String tmpNextLIne = "";
+            while (scanner.hasNextLine()) {
+                tmpNextLIne = scanner.nextLine();
+                if (tmpNextLIne.contains(BACKEND_SITE_PROPERTIES_NAME)) {
+                    url = tmpNextLIne.split("=")[1];
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+}
+package ru.kl.summary.services;
+
+
+
+public class GetHandler {
+
+    private String url = null;
+    private CountDownLatch countDownLatch = null;
+    private String responseFromServer = null;
+    private boolean gotResponse = false;
+
+    public String getResponseFromServer() {
+        return responseFromServer;
+    }
+
+    public boolean isGotResponse() {
+        return gotResponse;
+    }
+
+    public GetHandler(String url, CountDownLatch countDownLatch){
+        this.url = url;
+        this.countDownLatch = countDownLatch;
+    }
+
+    public void makeRequest() {
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                call.cancel();
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                responseFromServer = response.body().string();
+                gotResponse = true;
+                countDownLatch.countDown();
+            }
+        });
+    }
+}
+package ru.kl.summary.services;
+
+
+
+public class UploadObject {
+
+    private static Storage storage;
+    private static Thread t;
+    private static String CREDENTIALS_JSON = "silver-aurora-294418-eaf4b915b45e.json";
+    private static String GOOGLE_API_LINK = "https://www.googleapis.com/auth/cloud-platform";
+    private static String URL_PARAMS_TOKEN = "token=";
+    private static String POST_RECORD_ENPOINT = "/newAudioRecord";
+
+    public static void uploadObject(
+            String projectId, String bucketName, String objectName, String filePath) throws IOException {
+        /*
+        Storage setup
+         */
+        ;
+        GoogleCredentials credentials = GoogleCredentials.fromStream(MyApp.getContext().getAssets().open(CREDENTIALS_JSON))
+                .createScoped(Lists.newArrayList(GOOGLE_API_LINK));
+        storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        BlobId blobId = BlobId.of(bucketName, objectName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+
+        /*
+        Upload audio
+         */
+        t = new Thread() {
+            public void run() {
+                try {
+                    storage.create(blobInfo, Files.readAllBytes(Paths.get(filePath)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                while (t != null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e){
+                    }
+                }
+            }
+        };
+        t.start();
+        System.out.println(
+                "File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
+
+        String url = BackendUrlResolver.getBackendUrl();
+        TokenHandler tokenHandler = new TokenHandler();
+        String TOKEN = "";
+        try {
+            TOKEN = tokenHandler.getToken();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        url += POST_RECORD_ENPOINT + "?" + URL_PARAMS_TOKEN + TOKEN;
+//        RequestBody formBody = new FormBody.Builder()
+//                .add("recordFileName", objectName)
+//                .build();
+        String json = "{\"recordFileName\":\"" + objectName + "\"}";
+        RequestBody formBody  = RequestBody.create(json,
+                MediaType.parse("application/json"));
+
+        PostHandler postHandler = new PostHandler();
+        postHandler.makeRequest(url, formBody);
+        postHandler.stop();
+    }
+
+    public static Set<String> listFilesUsingJavaIO(String dir) {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+    }
+
+    public void printSomeStaff() {
+        System.out.println("LIST OF DIRECTORIES (UPLOAD CLASS): ");
+        File directory = new File(MyApp.getContext().getFilesDir().toString() + "/AudioRecorder");
+        String[] directories = directory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        System.out.println(Arrays.toString(directories));
+
+        System.out.println("LIST OF FILES (UPLOAD CLASS): ");
+        Set<String> listOfFiles = listFilesUsingJavaIO(directory.toString());
+        listOfFiles.stream().forEach(x -> System.out.println(x));
+
+        System.out.println("Buckets:");
+        Page<Bucket> buckets = storage.list();
+        for (Bucket bucket : buckets.iterateAll()) {
+            System.out.println(bucket.toString());
+        }
+    }
+
+    public void stopThread(){
+        t = null;
+    }
+}package ru.kl.summary.services;
+
+
+
+public class FlacEncoder {
+//    /**
+//     * Constructor
+//     */
+//    public FlacEncoder() {
+//
+//    }
+//
+//    /**
+//     * Converts a wave file to a FLAC file(in order to POST the data to Google and retrieve a response) <br>
+//     * Sample Rate is 8000 by default
+//     *
+//     * @param inputFile  Input wave file
+//     * @param outputFile Output FLAC file
+//     */
+//    public void convertWaveToFlac(File inputFile, File outputFile) {
+//
+//
+//        StreamConfiguration streamConfiguration = new StreamConfiguration();
+//        streamConfiguration.setSampleRate(8000);
+//        streamConfiguration.setBitsPerSample(16);
+//        streamConfiguration.setChannelCount(1);
+//
+//
+//        try {
+//            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputFile);
+//            AudioFormat format = audioInputStream.getFormat();
+//
+//            int frameSize = format.getFrameSize();
+//
+//            FLACEncoder flacEncoder = new FLACEncoder();
+//            FLACFileOutputStream flacOutputStream = new FLACFileOutputStream(outputFile);
+//
+//            flacEncoder.setStreamConfiguration(streamConfiguration);
+//            flacEncoder.setOutputStream(flacOutputStream);
+//
+//            flacEncoder.openFLACStream();
+//
+//            int frameLength = (int) audioInputStream.getFrameLength();
+//            if(frameLength <= AudioSystem.NOT_SPECIFIED){
+//                frameLength = 16384;//Arbitrary file size
+//            }
+//            int[] sampleData = new int[frameLength];
+//            byte[] samplesIn = new byte[frameSize];
+//
+//            int i = 0;
+//
+//            while (audioInputStream.read(samplesIn, 0, frameSize) != -1) {
+//                if (frameSize != 1) {
+//                    ByteBuffer bb = ByteBuffer.wrap(samplesIn);
+//                    bb.order(ByteOrder.LITTLE_ENDIAN);
+//                    short shortVal = bb.getShort();
+//                    sampleData[i] = shortVal;
+//                } else {
+//                    sampleData[i] = samplesIn[0];
+//                }
+//
+//                i++;
+//            }
+//
+//            sampleData = truncateNullData(sampleData, i);
+//
+//            flacEncoder.addSamples(sampleData, i);
+//            flacEncoder.encodeSamples(i, false);
+//            flacEncoder.encodeSamples(flacEncoder.samplesAvailableToEncode(), true);
+//
+//            audioInputStream.close();
+//            flacOutputStream.close();
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+//
+//
+//    /**
+//     * Converts a wave file to a FLAC file(in order to POST the data to Google and retrieve a response) <br>
+//     * Sample Rate is 8000 by default
+//     *
+//     * @param inputFile  Input wave file
+//     * @param outputFile Output FLAC file
+//     */
+//    public void convertWaveToFlac(String inputFile, String outputFile) {
+//        convertWaveToFlac(new File(inputFile), new File(outputFile));
+//    }
+//
+//    /**
+//     * Used for when the frame length is unknown to shorten the array to prevent huge blank end space
+//     * @param sampleData The int[] array you want to shorten
+//     * @param index The index you want to shorten it to
+//     * @return The shortened array
+//     */
+//    private int[] truncateNullData(int[] sampleData, int index){
+//        if(index == sampleData.length) return sampleData;
+//        int[] out = new int[index];
+//        for(int i = 0; i<index; i++){
+//            out[i] = sampleData[i];
+//        }
+//        return out;
+//    }
+}
+package ru.kl.summary;
+
+
+
+public class SettingsActivity extends AppCompatActivity {
+    private Button setup;
+    private Button templates;
+    private Button keywords;
+    private Button endlines;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        setup = findViewById(R.id.setup_b);
+        setup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToSetup(view);
+            }
+        });
+
+        templates = findViewById(R.id.templates_b);
+        templates.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToTemplates(view);
+            }
+        });
+
+        keywords = findViewById(R.id.keywords_b);
+        keywords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToKeywords(view);
+            }
+        });
+
+        endlines = findViewById(R.id.endline_b);
+        endlines.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToEndlines(view);
+            }
+        });
+    }
+
+    public void goToSetup(View view){
+        Intent intent = new Intent(this, SetupActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToTemplates(View view){
+        Intent intent = new Intent(this, TemplatesActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToKeywords(View view){
+        Intent intent = new Intent(this, KeywordsActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToEndlines(View view){
+        Intent intent = new Intent(this, EndlinesActivity.class);
+        startActivity(intent);
+    }
+}

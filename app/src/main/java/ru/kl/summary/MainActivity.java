@@ -141,28 +141,6 @@ public class MainActivity extends AppCompatActivity {
     public void logIn(View view) {
 
 
-//        for (int i = 0; i < neededPermissions.length; i++) {
-//            if (ContextCompat.checkSelfPermission(
-//                    MyApp.getContext(), neededPermissions[i]) ==
-//                    PackageManager.PERMISSION_GRANTED) {
-//                // You can use the API that requires the permission.
-//                System.out.println(neededPermissions[i] + " permission granted.");
-//                ;
-////            } else if (shouldShowRequestPermissionRationale(...)) {
-////                // In an educational UI, explain to the user why your app requires this
-////                // permission for a specific feature to behave as expected. In this UI,
-////                // include a "cancel" or "no thanks" button that allows the user to
-////                // continue using your app without granting the permission.
-////                showInContextUI(...);
-//            } else {
-//                // You can directly ask for the permission.
-//                ActivityCompat.requestPermissions(this,
-//                        new String [] {permissionsToRequest [i]},
-//                        REQUEST_CODE);
-//            }
-//        }
-
-
         Intent intent = new Intent(this, MenuActivity.class);
         startActivity(intent);
     }
